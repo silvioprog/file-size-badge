@@ -2,7 +2,7 @@
   "name": "file-size-badge",
   "displayName": "File Size Badge",
   "description": "Displays file sizes as badges in the file explorer and shows the active file size in the status bar.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "silvioprog",
   "license": "MIT",
   "icon": "icon.png",
@@ -25,6 +25,26 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "contributes": {
+    "configuration": {
+      "title": "File Size Badge",
+      "properties": {
+        "fileSizeBadge.excludedDirectories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".git",
+            "build",
+            "dist",
+            "node_modules"
+          ],
+          "description": "Directories to exclude from file size tracking. This improves performance by reducing unnecessary file system operations."
+        }
+      }
+    }
+  },
   "main": "./dist/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",

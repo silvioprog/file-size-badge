@@ -31,6 +31,16 @@ export const workspace = {
     onDidDelete: jest.fn(),
     onDidChange: jest.fn(),
     dispose: jest.fn()
+  })),
+  getConfiguration: jest.fn((section?: string) => ({
+    get: jest.fn((key: string, defaultValue?: unknown) => {
+      if (section === "fileSizeBadge") {
+        if (key === "excludedDirectories") {
+          return defaultValue || [".git", "build", "dist", "node_modules"];
+        }
+      }
+      return defaultValue;
+    })
   }))
 };
 
