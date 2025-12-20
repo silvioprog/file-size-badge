@@ -1,13 +1,14 @@
 import * as vscode from "vscode";
+import { provider } from "./provider";
 import { eventEmitter, updateDecorations } from "./eventEmitter";
 import { fileWatcher } from "./fileWatcher";
-import { provider } from "./provider";
 import {
   statusBar,
   updateStatusBar,
   updateStatusBarOnChangeActiveTextEditor,
   updateStatusBarOnChangeTabs,
-  updateStatusBarOnSaveTextDocument
+  updateStatusBarOnSaveTextDocument,
+  updateStatusBarOnChangeConfiguration
 } from "./statusBar";
 
 vscode.workspace.onDidChangeWorkspaceFolders(() => updateDecorations());
@@ -21,6 +22,11 @@ vscode.workspace.onDidRenameFiles(({ files }) =>
 );
 vscode.workspace.onDidSaveTextDocument(({ uri }) => updateDecorations(uri));
 vscode.workspace.onDidOpenTextDocument(({ uri }) => updateDecorations(uri));
+vscode.workspace.onDidChangeConfiguration((e) => {
+  if (e.affectsConfiguration("fileSizeBadge")) {
+    updateDecorations();
+  }
+});
 
 export function activate({ subscriptions }: vscode.ExtensionContext) {
   subscriptions.push(
@@ -30,7 +36,8 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
     statusBar,
     updateStatusBarOnChangeActiveTextEditor,
     updateStatusBarOnChangeTabs,
-    updateStatusBarOnSaveTextDocument
+    updateStatusBarOnSaveTextDocument,
+    updateStatusBarOnChangeConfiguration
   );
   updateStatusBar();
 }

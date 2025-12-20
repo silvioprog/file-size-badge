@@ -6,7 +6,7 @@ const getExcludedDirs = () =>
     .getConfiguration("fileSizeBadge")
     .get<string[]>("excludedDirectories", []);
 
-const shouldExclude = (fsPath: string) => {
+export const shouldExclude = (fsPath: string) => {
   const normalizedPath = fsPath.replace(/\\/g, "/");
 
   return getExcludedDirs().some(

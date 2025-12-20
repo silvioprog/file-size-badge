@@ -14,18 +14,15 @@ export const window = {
     show: jest.fn(),
     hide: jest.fn()
   })),
-  onDidChangeActiveTextEditor: jest.fn(() => ({
+  registerFileDecorationProvider: jest.fn(() => ({
     dispose: jest.fn()
   })),
-  registerFileDecorationProvider: jest.fn(() => ({
+  onDidChangeActiveTextEditor: jest.fn(() => ({
     dispose: jest.fn()
   }))
 };
 
 export const workspace = {
-  onDidSaveTextDocument: jest.fn(() => ({
-    dispose: jest.fn()
-  })),
   createFileSystemWatcher: jest.fn(() => ({
     onDidCreate: jest.fn(),
     onDidDelete: jest.fn(),
@@ -38,9 +35,21 @@ export const workspace = {
         if (key === "excludedDirectories") {
           return defaultValue || [".git", "build", "dist", "node_modules"];
         }
+        if (key === "statusBarPriority") {
+          return defaultValue !== undefined ? defaultValue : null;
+        }
+        if (key === "statusBarAlignment") {
+          return defaultValue !== undefined ? defaultValue : "Left";
+        }
       }
       return defaultValue;
     })
+  })),
+  onDidSaveTextDocument: jest.fn(() => ({
+    dispose: jest.fn()
+  })),
+  onDidChangeConfiguration: jest.fn(() => ({
+    dispose: jest.fn()
   }))
 };
 

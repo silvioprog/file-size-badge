@@ -14,7 +14,7 @@ Compatible with VS Code and Cursor.
 
 ## Notes
 
-The ⓘ symbol is displayed when file sizes cannot be represented in exactly 2 characters (the limitation of VS Code badges). In these cases, hover over the file to see the full human-readable file size in the tooltip.
+The ⓘ symbol is displayed when file sizes cannot be represented in exactly 2 characters (the limitation of IDE badges). In these cases, hover over the file to see the full human-readable file size in the tooltip.
 
 ## Configuration
 
@@ -24,7 +24,19 @@ Array of directory names to exclude from file size tracking. This improves perfo
 
 **Default:** `[".git", "build", "dist", "node_modules"]`
 
-You can customize this list in your VS Code settings to exclude additional directories specific to your project.
+You can customize this list in your IDE settings to exclude additional directories specific to your project.
+
+### `fileSizeBadge.statusBarAlignment`
+
+Alignment of the status bar item. Choose `"Left"` to place it on the left side of the status bar, or `"Right"` to place it on the right side.
+
+**Default:** `"Left"`
+
+### `fileSizeBadge.statusBarPriority`
+
+Priority for the status bar item. Lower numbers appear more to the left. Leave empty to let IDE decide the priority automatically.
+
+**Default:** `null`
 
 ## License
 
