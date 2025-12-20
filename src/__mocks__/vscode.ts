@@ -35,11 +35,13 @@ export const workspace = {
         if (key === "excludedDirectories") {
           return defaultValue || [".git", "build", "dist", "node_modules"];
         }
-        if (key === "statusBarPriority") {
-          return defaultValue !== undefined ? defaultValue : null;
-        }
-        if (key === "statusBarAlignment") {
+      }
+      if (section === "fileSizeBadge.statusBar") {
+        if (key === "alignment") {
           return defaultValue !== undefined ? defaultValue : "Left";
+        }
+        if (key === "priority") {
+          return defaultValue !== undefined ? defaultValue : null;
         }
       }
       return defaultValue;

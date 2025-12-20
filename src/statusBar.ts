@@ -26,12 +26,12 @@ const getUri = () => {
 };
 
 const getStatusBarConfig = () => {
-  const config = vscode.workspace.getConfiguration("fileSizeBadge");
+  const config = vscode.workspace.getConfiguration("fileSizeBadge.statusBar");
   const alignment = config.get<keyof typeof vscode.StatusBarAlignment>(
-    "statusBarAlignment",
+    "alignment",
     "Left"
   );
-  const priority = config.get<number>("statusBarPriority");
+  const priority = config.get<number>("priority");
 
   return [vscode.StatusBarAlignment[alignment], priority] as const;
 };
@@ -81,10 +81,7 @@ export const updateStatusBarOnSaveTextDocument =
 
 export const updateStatusBarOnChangeConfiguration =
   vscode.workspace.onDidChangeConfiguration((e) => {
-    if (
-      e.affectsConfiguration("fileSizeBadge.statusBarAlignment") ||
-      e.affectsConfiguration("fileSizeBadge.statusBarPriority")
-    ) {
+    if (e.affectsConfiguration("fileSizeBadge.statusBar")) {
       recreateStatusBar();
     }
   });

@@ -2,7 +2,7 @@
   "name": "file-size-badge",
   "displayName": "File Size Badge",
   "description": "Displays file sizes as badges in the file explorer and shows the active file size in the status bar.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "silvioprog",
   "license": "MIT",
   "icon": "icon.png",
@@ -42,22 +42,28 @@
           ],
           "description": "Directories to exclude from file size tracking. This improves performance by reducing unnecessary file system operations."
         },
-        "fileSizeBadge.statusBarAlignment": {
-          "type": "string",
-          "enum": [
-            "Left",
-            "Right"
-          ],
-          "default": "Left",
-          "description": "Alignment of the status bar item. 'Left' places it on the left side, 'Right' on the right side."
-        },
-        "fileSizeBadge.statusBarPriority": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "default": null,
-          "description": "Priority for the status bar item. Lower numbers appear more to the left. Leave empty to let IDE decide the position automatically."
+        "fileSizeBadge.statusBar": {
+          "type": "object",
+          "description": "Status bar display settings",
+          "properties": {
+            "alignment": {
+              "type": "string",
+              "enum": [
+                "Left",
+                "Right"
+              ],
+              "default": "Left",
+              "description": "Alignment of the status bar item. 'Left' places it on the left side, 'Right' on the right side."
+            },
+            "priority": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "default": null,
+              "description": "Priority for the status bar item. Lower numbers appear more to the left. Leave empty to let IDE decide the position automatically."
+            }
+          }
         }
       }
     }

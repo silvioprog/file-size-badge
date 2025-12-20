@@ -26,13 +26,13 @@ Array of directory names to exclude from file size tracking. This improves perfo
 
 You can customize this list in your IDE settings to exclude additional directories specific to your project.
 
-### `fileSizeBadge.statusBarAlignment`
+### `fileSizeBadge.statusBar.alignment`
 
 Alignment of the status bar item. Choose `"Left"` to place it on the left side of the status bar, or `"Right"` to place it on the right side.
 
 **Default:** `"Left"`
 
-### `fileSizeBadge.statusBarPriority`
+### `fileSizeBadge.statusBar.priority`
 
 Priority for the status bar item. Lower numbers appear more to the left. Leave empty to let IDE decide the priority automatically.
 
