@@ -12,24 +12,24 @@ import {
 } from "./statusBar";
 
 vscode.workspace.onDidChangeWorkspaceFolders(() => updateDecorations());
-vscode.workspace.onDidCreateFiles(({ files }) => updateDecorations([...files]));
-vscode.workspace.onDidDeleteFiles(({ files }) => updateDecorations([...files]));
-vscode.workspace.onDidRenameFiles(({ files }) =>
+vscode.workspace.onDidCreateFiles((e) => updateDecorations([...e.files]));
+vscode.workspace.onDidDeleteFiles((e) => updateDecorations([...e.files]));
+vscode.workspace.onDidRenameFiles((e) =>
   updateDecorations([
-    ...files.map(({ oldUri }) => oldUri),
-    ...files.map(({ newUri }) => newUri)
+    ...e.files.map((file) => file.oldUri),
+    ...e.files.map((file) => file.newUri)
   ])
 );
-vscode.workspace.onDidSaveTextDocument(({ uri }) => updateDecorations(uri));
-vscode.workspace.onDidOpenTextDocument(({ uri }) => updateDecorations(uri));
+vscode.workspace.onDidSaveTextDocument((e) => updateDecorations(e.uri));
+vscode.workspace.onDidOpenTextDocument((e) => updateDecorations(e.uri));
 vscode.workspace.onDidChangeConfiguration((e) => {
   if (e.affectsConfiguration("fileSizeBadge")) {
     updateDecorations();
   }
 });
 
-export function activate({ subscriptions }: vscode.ExtensionContext) {
-  subscriptions.push(
+export function activate(context: vscode.ExtensionContext) {
+  context.subscriptions.push(
     provider,
     eventEmitter,
     fileWatcher,

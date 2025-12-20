@@ -44,9 +44,19 @@ export const workspace = {
           return defaultValue !== undefined ? defaultValue : null;
         }
       }
+      if (section === "fileSizeBadge.loc") {
+        if (key === "showInTooltips") {
+          return defaultValue !== undefined ? defaultValue : true;
+        }
+        if (key === "showInStatusBar") {
+          return defaultValue !== undefined ? defaultValue : true;
+        }
+      }
+
       return defaultValue;
     })
   })),
+  textDocuments: [],
   onDidSaveTextDocument: jest.fn(() => ({
     dispose: jest.fn()
   })),
@@ -68,6 +78,9 @@ export class Uri {
   static file(path: string) {
     return new Uri("file", path);
   }
+  toString() {
+    return `${this.scheme}://${this.fsPath}`;
+  }
 }
 
 export class EventEmitter<T> {
@@ -75,6 +88,7 @@ export class EventEmitter<T> {
 
   event = (listener: (data: T) => void) => {
     this.listeners.push(listener);
+
     return {
       dispose: () => {
         const index = this.listeners.indexOf(listener);

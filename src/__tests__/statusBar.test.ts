@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
-import * as utilsModule from "../utils";
+import { formatFileSize, getFileSize } from "../utils";
+import { formatLoc, getLineCounts } from "../loc";
 
 jest.mock("../utils");
+jest.mock("../loc");
 
 let mockStatusBarItem: {
   text: string;
@@ -35,6 +37,11 @@ describe("statusBar", () => {
     ).activeTab = undefined;
     mockStatusBarItem.text = "";
     mockStatusBarItem.tooltip = "";
+    (getLineCounts as jest.Mock).mockReturnValue(null);
+    (formatLoc as jest.Mock).mockReturnValue({
+      text: "1 KB",
+      tooltip: "1 KB"
+    });
   });
 
   it("should update status bar with file size when active editor has file URI", () => {
@@ -44,14 +51,49 @@ describe("statusBar", () => {
     ).activeTextEditor = {
       document: { uri: mockUri }
     };
-    (utilsModule.getFileSize as jest.Mock).mockReturnValue(1024);
-    (utilsModule.formatFileSize as jest.Mock).mockReturnValue("1.0K");
+    (getFileSize as jest.Mock).mockReturnValue(1024);
+    (formatFileSize as jest.Mock).mockReturnValue("1 KB");
+    (getLineCounts as jest.Mock).mockReturnValue(null);
+    (formatLoc as jest.Mock).mockReturnValue({
+      text: "1 KB",
+      tooltip: "1 KB"
+    });
 
     statusBarModule.updateStatusBar();
 
-    expect(utilsModule.getFileSize).toHaveBeenCalledWith("/path/to/file.txt");
-    expect(mockStatusBarItem.text).toBe("$(file) 1.0K");
-    expect(mockStatusBarItem.tooltip).toBe("File size: 1.0K");
+    expect(getFileSize).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(mockStatusBarItem.text).toBe("$(file) 1 KB");
+    expect(mockStatusBarItem.tooltip).toBe("1 KB");
+    expect(mockStatusBarItem.show).toHaveBeenCalled();
+  });
+
+  it("should update status bar with LOC when line counts are available", () => {
+    const mockUri = vscode.Uri.file("/path/to/file.txt");
+    (
+      vscode.window as { activeTextEditor?: { document: { uri: vscode.Uri } } }
+    ).activeTextEditor = {
+      document: { uri: mockUri }
+    };
+    (getFileSize as jest.Mock).mockReturnValue(1239);
+    (formatFileSize as jest.Mock).mockReturnValue("1.21 KB");
+    const lineCounts = { total: 38, loc: 35 };
+    (getLineCounts as jest.Mock).mockReturnValue(lineCounts);
+    (formatLoc as jest.Mock).mockReturnValue({
+      text: "38 lines (35 loc) • 1.21 KB",
+      tooltip: "38 lines (35 loc) • 1.21 KB"
+    });
+
+    statusBarModule.updateStatusBar();
+
+    expect(getFileSize).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(formatLoc).toHaveBeenCalledWith({
+      lineCounts,
+      formattedFileSize: "1.21 KB"
+    });
+    expect(mockStatusBarItem.text).toBe("$(file) 38 lines (35 loc) • 1.21 KB");
+    expect(mockStatusBarItem.tooltip).toBe("38 lines (35 loc) • 1.21 KB");
     expect(mockStatusBarItem.show).toHaveBeenCalled();
   });
 

@@ -1,6 +1,6 @@
 # File Size Badge
 
-Displays file sizes as badges in the file explorer and shows the active file size in the status bar.
+Displays file sizes as badges in the file explorer and shows the active file size in the status bar. Also displays Lines of Code (LOC) information in tooltips and status bar.
 
 Compatible with VS Code and Cursor.
 
@@ -9,8 +9,9 @@ Compatible with VS Code and Cursor.
 ## Features
 
 - Shows file sizes as badges next to files in the explorer
-- Hover over files to see human-readable file sizes in tooltips
-- Displays the size of the currently active file in the status bar
+- Hover over files to see human-readable file sizes and LOC information in tooltips
+- Displays the size and LOC of the currently active file in the status bar
+- Configurable LOC display in tooltips and status bar
 
 ## Notes
 
@@ -25,6 +26,18 @@ Array of directory names to exclude from file size tracking. This improves perfo
 **Default:** `[".git", "build", "dist", "node_modules"]`
 
 You can customize this list in your IDE settings to exclude additional directories specific to your project.
+
+### `fileSizeBadge.loc.showInTooltips`
+
+Show Lines of Code (LOC) information in tooltips. When enabled, displays `"X lines (Y loc) • Z KB"` format. When disabled, shows only the file size.
+
+**Default:** `true`
+
+### `fileSizeBadge.loc.showInStatusBar`
+
+Show Lines of Code (LOC) information in the status bar item. When enabled, displays `"X lines (Y loc) • Z KB"` format. When disabled, shows only the file size.
+
+**Default:** `true`
 
 ### `fileSizeBadge.statusBar.alignment`
 

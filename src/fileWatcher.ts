@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { updateDecorations } from "./eventEmitter";
 
-const getExcludedDirs = () =>
+const getExcludedDirsConfig = () =>
   vscode.workspace
     .getConfiguration("fileSizeBadge")
     .get<string[]>("excludedDirectories", []);
@@ -9,7 +9,7 @@ const getExcludedDirs = () =>
 export const shouldExclude = (fsPath: string) => {
   const normalizedPath = fsPath.replace(/\\/g, "/");
 
-  return getExcludedDirs().some(
+  return getExcludedDirsConfig().some(
     (dir) =>
       normalizedPath.includes(`/${dir}/`) || normalizedPath.endsWith(`/${dir}`)
   );

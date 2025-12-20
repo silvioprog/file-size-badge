@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { formatFileSize, getFileSize } from "./utils";
 import { shouldExclude } from "./fileWatcher";
+import { formatLoc, getLineCounts } from "./loc";
 
 const getUri = () => {
   const activeEditor = vscode.window.activeTextEditor;
@@ -58,9 +59,12 @@ export const updateStatusBar = () => {
     statusBar.hide();
     return;
   }
-  const formattedFileSize = formatFileSize(fileSize);
-  statusBar.text = `$(file) ${formattedFileSize}`;
-  statusBar.tooltip = `File size: ${formattedFileSize}`;
+  const loc = formatLoc({
+    lineCounts: getLineCounts(uri.fsPath),
+    formattedFileSize: formatFileSize(fileSize)
+  });
+  statusBar.text = `$(file) ${loc.text}`;
+  statusBar.tooltip = loc.tooltip;
   statusBar.show();
 };
 
@@ -83,5 +87,7 @@ export const updateStatusBarOnChangeConfiguration =
   vscode.workspace.onDidChangeConfiguration((e) => {
     if (e.affectsConfiguration("fileSizeBadge.statusBar")) {
       recreateStatusBar();
+    } else if (e.affectsConfiguration("fileSizeBadge.loc")) {
+      updateStatusBar();
     }
   });
