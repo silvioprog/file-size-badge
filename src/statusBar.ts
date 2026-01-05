@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { formatFileSize, getFileSize } from "./utils";
+import { formatFileSize, getFileSize, getTotalProjectSize } from "./utils";
 import { shouldExclude } from "./fileWatcher";
 import { formatLoc, getLineCounts } from "./loc";
 
@@ -44,6 +44,11 @@ export let statusBar = vscode.window.createStatusBarItem(
   ...getStatusBarConfig()
 );
 
+export const projectStatusBar = vscode.window.createStatusBarItem(
+  vscode.StatusBarAlignment.Right,
+  100
+);
+
 export const updateStatusBar = () => {
   const uri = getUri();
   if (!uri || uri.scheme !== "file") {
@@ -68,10 +73,22 @@ export const updateStatusBar = () => {
   statusBar.show();
 };
 
+export const updateProjectStatusBar = () => {
+  const projectSize = getTotalProjectSize();
+  if (projectSize === 0) {
+    projectStatusBar.hide();
+    return;
+  }
+  projectStatusBar.text = `$(folder) ${formatFileSize(projectSize)}`;
+  projectStatusBar.tooltip = `Project size: ${formatFileSize(projectSize)}`;
+  projectStatusBar.show();
+};
+
 export const recreateStatusBar = () => {
   statusBar.dispose();
   statusBar = vscode.window.createStatusBarItem(...getStatusBarConfig());
   updateStatusBar();
+  updateProjectStatusBar();
 };
 
 export const updateStatusBarOnChangeActiveTextEditor =
@@ -91,3 +108,12 @@ export const updateStatusBarOnChangeConfiguration =
       updateStatusBar();
     }
   });
+
+export const updateProjectStatusBarOnFileChange =
+  vscode.workspace.onDidSaveTextDocument(() => updateProjectStatusBar());
+
+export const updateProjectStatusBarOnCreateFiles =
+  vscode.workspace.onDidCreateFiles(() => updateProjectStatusBar());
+
+export const updateProjectStatusBarOnDeleteFiles =
+  vscode.workspace.onDidDeleteFiles(() => updateProjectStatusBar());

@@ -4,11 +4,16 @@ import { eventEmitter, updateDecorations } from "./eventEmitter";
 import { fileWatcher } from "./fileWatcher";
 import {
   statusBar,
+  projectStatusBar,
   updateStatusBar,
+  updateProjectStatusBar,
   updateStatusBarOnChangeActiveTextEditor,
   updateStatusBarOnChangeTabs,
   updateStatusBarOnSaveTextDocument,
-  updateStatusBarOnChangeConfiguration
+  updateStatusBarOnChangeConfiguration,
+  updateProjectStatusBarOnFileChange,
+  updateProjectStatusBarOnCreateFiles,
+  updateProjectStatusBarOnDeleteFiles
 } from "./statusBar";
 
 vscode.workspace.onDidChangeWorkspaceFolders(() => updateDecorations());
@@ -34,12 +39,17 @@ export function activate(context: vscode.ExtensionContext) {
     eventEmitter,
     fileWatcher,
     statusBar,
+    projectStatusBar,
     updateStatusBarOnChangeActiveTextEditor,
     updateStatusBarOnChangeTabs,
     updateStatusBarOnSaveTextDocument,
-    updateStatusBarOnChangeConfiguration
+    updateStatusBarOnChangeConfiguration,
+    updateProjectStatusBarOnFileChange,
+    updateProjectStatusBarOnCreateFiles,
+    updateProjectStatusBarOnDeleteFiles
   );
   updateStatusBar();
+  updateProjectStatusBar();
 }
 
 export function deactivate() {}

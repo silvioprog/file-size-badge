@@ -1,4 +1,7 @@
 import fs from "fs";
+import path from "path";
+import * as vscode from "vscode";
+import { shouldExclude } from "./fileWatcher";
 
 export const getFileSize = (path: string): number | null => {
   try {
@@ -48,4 +51,29 @@ export const formatBadgeFileSize = (bytes: number): string => {
   if (tb === 0) return "ⓘ";
   if (tb < 10) return `${tb}T`;
   return "ⓘ";
+};
+
+export const getTotalProjectSize = (): number => {
+  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (!root) return 0;
+  let total = 0;
+  const walk = (dir: string) => {
+    try {
+      const items = fs.readdirSync(dir);
+      for (const item of items) {
+        const fullPath = path.join(dir, item);
+        if (shouldExclude(fullPath)) continue;
+        const stat = fs.statSync(fullPath);
+        if (stat.isFile()) {
+          total += stat.size;
+        } else if (stat.isDirectory()) {
+          walk(fullPath);
+        }
+      }
+    } catch {
+      // Ignore errors, e.g., permission issues
+    }
+  };
+  walk(root);
+  return total;
 };
