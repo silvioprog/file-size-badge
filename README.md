@@ -2,7 +2,7 @@
 
 Displays file sizes as badges in the file explorer and shows the active file size in the status bar. Also displays Lines of Code (LOC) information in tooltips and status bar.
 
-Compatible with VS Code and Cursor.
+Compatible with VS Code, Cursor, and Antigravity.
 
 ![Demo](demo.webp)
 
