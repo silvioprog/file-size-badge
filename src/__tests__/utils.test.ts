@@ -1,7 +1,9 @@
-import fs from "fs";
+import fs from "fs/promises";
 import { getFileSize, formatFileSize, formatBadgeFileSize } from "../utils";
 
-jest.mock("fs");
+jest.mock("fs/promises", () => ({
+  stat: jest.fn()
+}));
 
 describe("utils", () => {
   beforeEach(() => {
@@ -9,44 +11,40 @@ describe("utils", () => {
   });
 
   describe("getFileSize", () => {
-    it("should return file size for a valid file", () => {
+    it("should return file size for a valid file", async () => {
       const mockStat = {
         isFile: () => true,
         size: 1024
       };
-      (fs.statSync as jest.Mock).mockReturnValue(mockStat);
+      (fs.stat as jest.Mock).mockResolvedValue(mockStat);
 
-      const result = getFileSize("/path/to/file.txt");
+      const result = await getFileSize("/path/to/file.txt");
       expect(result).toBe(1024);
-      expect(fs.statSync).toHaveBeenCalledWith("/path/to/file.txt");
+      expect(fs.stat).toHaveBeenCalledWith("/path/to/file.txt");
     });
 
-    it("should return null for a directory", () => {
+    it("should return null for a directory", async () => {
       const mockStat = {
         isFile: () => false,
         size: 1024
       };
-      (fs.statSync as jest.Mock).mockReturnValue(mockStat);
+      (fs.stat as jest.Mock).mockResolvedValue(mockStat);
 
-      const result = getFileSize("/path/to/directory");
+      const result = await getFileSize("/path/to/directory");
       expect(result).toBeNull();
     });
 
-    it("should return null when file does not exist", () => {
-      (fs.statSync as jest.Mock).mockImplementation(() => {
-        throw new Error("File not found");
-      });
+    it("should return null when file does not exist", async () => {
+      (fs.stat as jest.Mock).mockRejectedValue(new Error("File not found"));
 
-      const result = getFileSize("/path/to/nonexistent.txt");
+      const result = await getFileSize("/path/to/nonexistent.txt");
       expect(result).toBeNull();
     });
 
-    it("should return null when statSync throws any error", () => {
-      (fs.statSync as jest.Mock).mockImplementation(() => {
-        throw new Error("Permission denied");
-      });
+    it("should return null when stat throws any error", async () => {
+      (fs.stat as jest.Mock).mockRejectedValue(new Error("Permission denied"));
 
-      const result = getFileSize("/path/to/file.txt");
+      const result = await getFileSize("/path/to/file.txt");
       expect(result).toBeNull();
     });
   });
@@ -93,10 +91,10 @@ describe("utils", () => {
       expect(formatBadgeFileSize(9)).toBe("9B");
     });
 
-    it("should return ⓘ for bytes between 10 and 1024", () => {
-      expect(formatBadgeFileSize(10)).toBe("ⓘ");
-      expect(formatBadgeFileSize(100)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1023)).toBe("ⓘ");
+    it("should return \u24d8 for bytes between 10 and 1024", () => {
+      expect(formatBadgeFileSize(10)).toBe("\u24d8");
+      expect(formatBadgeFileSize(100)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1023)).toBe("\u24d8");
     });
 
     it("should format KB less than 10 as K", () => {
@@ -105,10 +103,10 @@ describe("utils", () => {
       expect(formatBadgeFileSize(1024 * 9)).toBe("9K");
     });
 
-    it("should return ⓘ for KB between 10 and 100", () => {
-      expect(formatBadgeFileSize(1024 * 10)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 50)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 99)).toBe("ⓘ");
+    it("should return \u24d8 for KB between 10 and 100", () => {
+      expect(formatBadgeFileSize(1024 * 10)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 50)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 99)).toBe("\u24d8");
     });
 
     it("should format MB less than 10 as M", () => {
@@ -117,10 +115,10 @@ describe("utils", () => {
       expect(formatBadgeFileSize(1024 * 1024 * 9)).toBe("9M");
     });
 
-    it("should return ⓘ for MB between 10 and 100", () => {
-      expect(formatBadgeFileSize(1024 * 1024 * 10)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 1024 * 50)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 1024 * 99)).toBe("ⓘ");
+    it("should return \u24d8 for MB between 10 and 100", () => {
+      expect(formatBadgeFileSize(1024 * 1024 * 10)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 1024 * 50)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 1024 * 99)).toBe("\u24d8");
     });
 
     it("should format GB less than 10 as G", () => {
@@ -129,10 +127,10 @@ describe("utils", () => {
       expect(formatBadgeFileSize(1024 * 1024 * 1024 * 9)).toBe("9G");
     });
 
-    it("should return ⓘ for GB between 10 and 100", () => {
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 10)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 50)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 99)).toBe("ⓘ");
+    it("should return \u24d8 for GB between 10 and 100", () => {
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 10)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 50)).toBe("\u24d8");
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 99)).toBe("\u24d8");
     });
 
     it("should format TB less than 10 as T", () => {
@@ -141,24 +139,28 @@ describe("utils", () => {
       expect(formatBadgeFileSize(1024 * 1024 * 1024 * 1024 * 9)).toBe("9T");
     });
 
-    it("should return ⓘ for TB 10 and above", () => {
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 1024 * 10)).toBe("ⓘ");
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 1024 * 100)).toBe("ⓘ");
+    it("should return \u24d8 for TB 10 and above", () => {
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 1024 * 10)).toBe(
+        "\u24d8"
+      );
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 1024 * 100)).toBe(
+        "\u24d8"
+      );
     });
 
-    it("should return ⓘ when MB rounds to 0", () => {
-      // 100KB doesn't fit in badge format (>= 100KB shows ⓘ), and rounds to 0MB
-      expect(formatBadgeFileSize(1024 * 100)).toBe("ⓘ");
+    it("should return \u24d8 when MB rounds to 0", () => {
+      // 100KB doesn't fit in badge format (>= 100KB shows \u24d8), and rounds to 0MB
+      expect(formatBadgeFileSize(1024 * 100)).toBe("\u24d8");
     });
 
-    it("should return ⓘ when GB rounds to 0", () => {
-      // 100MB doesn't fit in badge format (>= 100MB shows ⓘ), and rounds to 0GB
-      expect(formatBadgeFileSize(1024 * 1024 * 100)).toBe("ⓘ");
+    it("should return \u24d8 when GB rounds to 0", () => {
+      // 100MB doesn't fit in badge format (>= 100MB shows \u24d8), and rounds to 0GB
+      expect(formatBadgeFileSize(1024 * 1024 * 100)).toBe("\u24d8");
     });
 
-    it("should return ⓘ when TB rounds to 0", () => {
-      // 100GB doesn't fit in badge format (>= 100GB shows ⓘ), and rounds to 0TB
-      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 100)).toBe("ⓘ");
+    it("should return \u24d8 when TB rounds to 0", () => {
+      // 100GB doesn't fit in badge format (>= 100GB shows \u24d8), and rounds to 0TB
+      expect(formatBadgeFileSize(1024 * 1024 * 1024 * 100)).toBe("\u24d8");
     });
   });
 });

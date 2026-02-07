@@ -1,8 +1,8 @@
-import fs from "fs";
+import fs from "fs/promises";
 
-export const getFileSize = (path: string): number | null => {
+export const getFileSize = async (path: string) => {
   try {
-    const stat = fs.statSync(path);
+    const stat = await fs.stat(path);
     if (!stat.isFile()) return null;
     return stat.size;
   } catch {
