@@ -60,7 +60,7 @@ export const updateStatusBar = async () => {
     return;
   }
   const loc = formatLoc({
-    lineCounts: await getLineCounts(uri.fsPath),
+    lineCounts: await getLineCounts(uri.fsPath, { fileSize }),
     formattedFileSize: formatFileSize(fileSize)
   });
   statusBar.text = `$(file) ${loc.text}`;
