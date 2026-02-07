@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import { getFileSize, formatFileSize, formatBadgeFileSize } from "../utils";
+import { clearAll } from "../cache";
 
 jest.mock("fs/promises", () => ({
   stat: jest.fn()
@@ -8,6 +9,7 @@ jest.mock("fs/promises", () => ({
 describe("utils", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    clearAll();
   });
 
   describe("getFileSize", () => {

@@ -2,6 +2,7 @@ import { readFile } from "fs/promises";
 import * as vscode from "vscode";
 import { isBinaryFile } from "isbinaryfile";
 import { formatLoc, getLineCounts } from "../loc";
+import { clearAll } from "../cache";
 
 jest.mock("fs/promises", () => ({
   readFile: jest.fn()
@@ -12,6 +13,7 @@ jest.mock("isbinaryfile");
 describe("loc", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    clearAll();
     (isBinaryFile as jest.Mock).mockResolvedValue(false);
     (vscode.workspace.getConfiguration as jest.Mock).mockImplementation(
       (section?: string) => {

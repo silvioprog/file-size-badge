@@ -1,11 +1,21 @@
 import fs from "fs/promises";
+import { createCache } from "./cache";
+
+const fileSizeCache = createCache<number | null>(1000);
 
 export const getFileSize = async (path: string) => {
+  const cached = fileSizeCache.get(path);
+  if (cached !== undefined) return cached;
   try {
     const stat = await fs.stat(path);
-    if (!stat.isFile()) return null;
+    if (!stat.isFile()) {
+      fileSizeCache.set(path, null);
+      return null;
+    }
+    fileSizeCache.set(path, stat.size);
     return stat.size;
   } catch {
+    fileSizeCache.set(path, null);
     return null;
   }
 };
