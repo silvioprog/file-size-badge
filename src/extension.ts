@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { provider } from "./provider";
 import { eventEmitter, updateDecorations } from "./eventEmitter";
 import { fileWatcher } from "./fileWatcher";
+import { clearAll } from "./cache";
 import {
   statusBar,
   updateStatusBar,
@@ -11,7 +12,10 @@ import {
   updateStatusBarOnChangeConfiguration
 } from "./statusBar";
 
-vscode.workspace.onDidChangeWorkspaceFolders(() => updateDecorations());
+vscode.workspace.onDidChangeWorkspaceFolders(() => {
+  clearAll();
+  updateDecorations();
+});
 vscode.workspace.onDidCreateFiles((e) => updateDecorations([...e.files]));
 vscode.workspace.onDidDeleteFiles((e) => updateDecorations([...e.files]));
 vscode.workspace.onDidRenameFiles((e) =>
@@ -24,6 +28,7 @@ vscode.workspace.onDidSaveTextDocument((e) => updateDecorations(e.uri));
 vscode.workspace.onDidOpenTextDocument((e) => updateDecorations(e.uri));
 vscode.workspace.onDidChangeConfiguration((e) => {
   if (e.affectsConfiguration("fileSizeBadge")) {
+    clearAll();
     updateDecorations();
   }
 });

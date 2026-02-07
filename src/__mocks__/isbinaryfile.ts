@@ -1,1 +1,1 @@
-export const isBinaryFileSync = jest.fn();
+export const isBinaryFile = jest.fn();
