@@ -3,6 +3,8 @@ import { provider } from "./provider";
 import { eventEmitter, updateDecorations } from "./eventEmitter";
 import { fileWatcher } from "./fileWatcher";
 import { clearAll } from "./cache";
+import { formatFileSize, getFileSize } from "./utils";
+import { formatLoc, getLineCounts } from "./loc";
 import {
   statusBar,
   updateStatusBar,
@@ -34,11 +36,33 @@ vscode.workspace.onDidChangeConfiguration((e) => {
 });
 
 export function activate(context: vscode.ExtensionContext) {
+  const copyFileSizeCommand = vscode.commands.registerCommand(
+    "fileSizeBadge.copyFileSize",
+    async (uri?: vscode.Uri) => {
+      if (!uri) {
+        const editor = vscode.window.activeTextEditor;
+        if (editor?.document.uri.scheme === "file") {
+          uri = editor.document.uri;
+        }
+      }
+      if (!uri || uri.scheme !== "file") return;
+      const fileSize = await getFileSize(uri.fsPath);
+      if (fileSize === null) return;
+      const loc = formatLoc({
+        lineCounts: await getLineCounts(uri.fsPath, { fileSize }),
+        formattedFileSize: formatFileSize(fileSize)
+      });
+      await vscode.env.clipboard.writeText(loc.tooltip);
+      vscode.window.showInformationMessage(`Copied: ${loc.tooltip}`);
+    }
+  );
+
   context.subscriptions.push(
     provider,
     eventEmitter,
     fileWatcher,
     statusBar,
+    copyFileSizeCommand,
     updateStatusBarOnChangeActiveTextEditor,
     updateStatusBarOnChangeTabs,
     updateStatusBarOnSaveTextDocument,

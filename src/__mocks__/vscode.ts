@@ -1,12 +1,12 @@
+const disposable = () => ({ dispose: jest.fn() });
+
 export const window = {
   activeTextEditor: undefined as { document: { uri: Uri } } | undefined,
   tabGroups: {
     activeTabGroup: {
       activeTab: undefined as unknown
     },
-    onDidChangeTabs: jest.fn(() => ({
-      dispose: jest.fn()
-    }))
+    onDidChangeTabs: jest.fn(disposable)
   },
   createStatusBarItem: jest.fn(() => ({
     text: "",
@@ -14,12 +14,9 @@ export const window = {
     show: jest.fn(),
     hide: jest.fn()
   })),
-  registerFileDecorationProvider: jest.fn(() => ({
-    dispose: jest.fn()
-  })),
-  onDidChangeActiveTextEditor: jest.fn(() => ({
-    dispose: jest.fn()
-  }))
+  registerFileDecorationProvider: jest.fn(disposable),
+  onDidChangeActiveTextEditor: jest.fn(disposable),
+  showInformationMessage: jest.fn()
 };
 
 export const workspace = {
@@ -34,6 +31,9 @@ export const workspace = {
       if (section === "fileSizeBadge") {
         if (key === "excludedDirectories") {
           return defaultValue || [".git", "build", "dist", "node_modules"];
+        }
+        if (key === "excludedGlobs") {
+          return defaultValue || [];
         }
       }
       if (section === "fileSizeBadge.statusBar") {
@@ -57,12 +57,23 @@ export const workspace = {
     })
   })),
   textDocuments: [],
-  onDidSaveTextDocument: jest.fn(() => ({
-    dispose: jest.fn()
-  })),
-  onDidChangeConfiguration: jest.fn(() => ({
-    dispose: jest.fn()
-  }))
+  onDidChangeWorkspaceFolders: jest.fn(disposable),
+  onDidCreateFiles: jest.fn(disposable),
+  onDidDeleteFiles: jest.fn(disposable),
+  onDidRenameFiles: jest.fn(disposable),
+  onDidOpenTextDocument: jest.fn(disposable),
+  onDidSaveTextDocument: jest.fn(disposable),
+  onDidChangeConfiguration: jest.fn(disposable)
+};
+
+export const commands = {
+  registerCommand: jest.fn(disposable)
+};
+
+export const env = {
+  clipboard: {
+    writeText: jest.fn().mockResolvedValue(undefined)
+  }
 };
 
 export const StatusBarAlignment = {
@@ -129,6 +140,8 @@ export class TabInputNotebook {
 export default {
   window,
   workspace,
+  commands,
+  env,
   StatusBarAlignment,
   Uri,
   EventEmitter,
