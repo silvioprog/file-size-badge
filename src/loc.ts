@@ -1,6 +1,6 @@
-import fs from "fs";
+import { readFile } from "fs/promises";
 import * as vscode from "vscode";
-import { isBinaryFileSync } from "isbinaryfile";
+import { isBinaryFile } from "isbinaryfile";
 
 const getLocConfig = () => {
   const config = vscode.workspace.getConfiguration("fileSizeBadge.loc");
@@ -18,7 +18,7 @@ const getLineCountsFromDocument = (doc: vscode.TextDocument) => ({
   ).length
 });
 
-export const getLineCounts = (fsPath: string) => {
+export const getLineCounts = async (fsPath: string) => {
   try {
     const uri = vscode.Uri.file(fsPath);
     const activeEditor = vscode.window.activeTextEditor;
@@ -31,10 +31,11 @@ export const getLineCounts = (fsPath: string) => {
     if (openDoc) {
       return getLineCountsFromDocument(openDoc);
     }
-    if (isBinaryFileSync(fsPath)) {
+    if (await isBinaryFile(fsPath)) {
       return null;
     }
-    const lines = fs.readFileSync(fsPath, "utf8").split(/\r?\n/);
+    const content = await readFile(fsPath, "utf8");
+    const lines = content.split(/\r?\n/);
 
     return {
       total: lines.length,

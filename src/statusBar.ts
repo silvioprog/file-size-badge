@@ -44,7 +44,7 @@ export let statusBar = vscode.window.createStatusBarItem(
   ...getStatusBarConfig()
 );
 
-export const updateStatusBar = () => {
+export const updateStatusBar = async () => {
   const uri = getUri();
   if (!uri || uri.scheme !== "file") {
     statusBar.hide();
@@ -54,13 +54,13 @@ export const updateStatusBar = () => {
     statusBar.hide();
     return;
   }
-  const fileSize = getFileSize(uri.fsPath);
+  const fileSize = await getFileSize(uri.fsPath);
   if (fileSize === null) {
     statusBar.hide();
     return;
   }
   const loc = formatLoc({
-    lineCounts: getLineCounts(uri.fsPath),
+    lineCounts: await getLineCounts(uri.fsPath),
     formattedFileSize: formatFileSize(fileSize)
   });
   statusBar.text = `$(file) ${loc.text}`;

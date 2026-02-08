@@ -5,15 +5,17 @@ import { shouldExclude } from "./fileWatcher";
 import { formatLoc, getLineCounts } from "./loc";
 
 export const provider = vscode.window.registerFileDecorationProvider({
-  provideFileDecoration(uri) {
+  async provideFileDecoration(uri, token) {
     if (uri.scheme !== "file" || shouldExclude(uri.fsPath)) return;
-    const fileSize = getFileSize(uri.fsPath);
+    if (token.isCancellationRequested) return;
+    const fileSize = await getFileSize(uri.fsPath);
     if (fileSize === null) return;
+    if (token.isCancellationRequested) return;
 
     return {
       badge: formatBadgeFileSize(fileSize),
       tooltip: formatLoc({
-        lineCounts: getLineCounts(uri.fsPath),
+        lineCounts: await getLineCounts(uri.fsPath),
         formattedFileSize: formatFileSize(fileSize)
       }).tooltip
     };
