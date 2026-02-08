@@ -18,23 +18,13 @@ export const shouldExclude = (fsPath: string) => {
 
 export const fileWatcher = vscode.workspace.createFileSystemWatcher("**/*");
 
-fileWatcher.onDidCreate((uri) => {
+const handleFileEvent = (uri: vscode.Uri) => {
   if (!shouldExclude(uri.fsPath)) {
     invalidateAll(uri.fsPath);
     updateDecorations(uri);
   }
-});
+};
 
-fileWatcher.onDidDelete((uri) => {
-  if (!shouldExclude(uri.fsPath)) {
-    invalidateAll(uri.fsPath);
-    updateDecorations(uri);
-  }
-});
-
-fileWatcher.onDidChange((uri) => {
-  if (!shouldExclude(uri.fsPath)) {
-    invalidateAll(uri.fsPath);
-    updateDecorations(uri);
-  }
-});
+fileWatcher.onDidCreate(handleFileEvent);
+fileWatcher.onDidDelete(handleFileEvent);
+fileWatcher.onDidChange(handleFileEvent);

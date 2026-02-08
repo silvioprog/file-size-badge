@@ -23,9 +23,10 @@ export const updateDecorations = (uri?: Uri) => {
   }
 
   debounceTimer = setTimeout(() => {
-    eventEmitter.fire(refreshAll ? undefined : pendingUris);
+    const uris = refreshAll ? undefined : [...pendingUris];
     pendingUris = [];
     refreshAll = false;
     debounceTimer = undefined;
+    eventEmitter.fire(uris);
   }, DEBOUNCE_MS);
 };
