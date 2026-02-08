@@ -14,27 +14,6 @@ import {
   updateStatusBarOnChangeConfiguration
 } from "./statusBar";
 
-vscode.workspace.onDidChangeWorkspaceFolders(() => {
-  clearAll();
-  updateDecorations();
-});
-vscode.workspace.onDidCreateFiles((e) => updateDecorations([...e.files]));
-vscode.workspace.onDidDeleteFiles((e) => updateDecorations([...e.files]));
-vscode.workspace.onDidRenameFiles((e) =>
-  updateDecorations([
-    ...e.files.map((file) => file.oldUri),
-    ...e.files.map((file) => file.newUri)
-  ])
-);
-vscode.workspace.onDidSaveTextDocument((e) => updateDecorations(e.uri));
-vscode.workspace.onDidOpenTextDocument((e) => updateDecorations(e.uri));
-vscode.workspace.onDidChangeConfiguration((e) => {
-  if (e.affectsConfiguration("fileSizeBadge")) {
-    clearAll();
-    updateDecorations();
-  }
-});
-
 export function activate(context: vscode.ExtensionContext) {
   const copyFileSizeCommand = vscode.commands.registerCommand(
     "fileSizeBadge.copyFileSize",
@@ -66,7 +45,27 @@ export function activate(context: vscode.ExtensionContext) {
     updateStatusBarOnChangeActiveTextEditor,
     updateStatusBarOnChangeTabs,
     updateStatusBarOnSaveTextDocument,
-    updateStatusBarOnChangeConfiguration
+    updateStatusBarOnChangeConfiguration,
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      clearAll();
+      updateDecorations();
+    }),
+    vscode.workspace.onDidCreateFiles((e) => updateDecorations([...e.files])),
+    vscode.workspace.onDidDeleteFiles((e) => updateDecorations([...e.files])),
+    vscode.workspace.onDidRenameFiles((e) =>
+      updateDecorations([
+        ...e.files.map((file) => file.oldUri),
+        ...e.files.map((file) => file.newUri)
+      ])
+    ),
+    vscode.workspace.onDidSaveTextDocument((e) => updateDecorations(e.uri)),
+    vscode.workspace.onDidOpenTextDocument((e) => updateDecorations(e.uri)),
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("fileSizeBadge")) {
+        clearAll();
+        updateDecorations();
+      }
+    })
   );
   updateStatusBar();
 }

@@ -27,11 +27,13 @@ jest.mock("../statusBar", () => ({
 }));
 
 let copyFileSizeHandler: (uri?: vscode.Uri) => Promise<void>;
+let subscriptions: { dispose: () => void }[];
 
 beforeAll(async () => {
   const mod = await import("../extension");
+  subscriptions = [];
   const mockContext = {
-    subscriptions: [] as { dispose: () => void }[]
+    subscriptions
   } as unknown as vscode.ExtensionContext;
   mod.activate(mockContext);
 
@@ -40,6 +42,15 @@ beforeAll(async () => {
   ).mock.calls.find(
     ([name]: [string]) => name === "fileSizeBadge.copyFileSize"
   )?.[1];
+});
+
+describe("activate", () => {
+  it("should track all disposables in subscriptions", () => {
+    expect(subscriptions.length).toBe(16);
+    expect(subscriptions.every((s) => typeof s.dispose === "function")).toBe(
+      true
+    );
+  });
 });
 
 describe("copyFileSize command", () => {

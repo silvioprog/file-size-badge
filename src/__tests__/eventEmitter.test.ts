@@ -87,6 +87,32 @@ describe("eventEmitter", () => {
     disposable.dispose();
   });
 
+  it("should handle re-entrant calls from listeners without corruption", () => {
+    const uri1 = vscode.Uri.file("/path/to/file1.txt");
+    const uri2 = vscode.Uri.file("/path/to/file2.txt");
+    const calls: (vscode.Uri[] | undefined)[] = [];
+
+    const disposable = onDidChangeFileDecorations((uris) => {
+      calls.push(uris as vscode.Uri[] | undefined);
+      if (calls.length === 1) {
+        updateDecorations(uri2);
+      }
+    });
+
+    updateDecorations(uri1);
+    jest.advanceTimersByTime(150);
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]).toEqual([uri1]);
+
+    jest.advanceTimersByTime(150);
+
+    expect(calls).toHaveLength(2);
+    expect(calls[1]).toEqual([uri2]);
+
+    disposable.dispose();
+  });
+
   it("should reset after firing", () => {
     const uri1 = vscode.Uri.file("/path/to/file1.txt");
     const uri2 = vscode.Uri.file("/path/to/file2.txt");
