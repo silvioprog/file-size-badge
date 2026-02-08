@@ -26,6 +26,22 @@
     "onStartupFinished"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "fileSizeBadge.copyFileSize",
+        "title": "Copy File Size",
+        "category": "File Size Badge"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "fileSizeBadge.copyFileSize",
+          "when": "!explorerResourceIsFolder",
+          "group": "6_copypath"
+        }
+      ]
+    },
     "configuration": {
       "title": "File Size Badge",
       "properties": {
@@ -41,6 +57,14 @@
             "node_modules"
           ],
           "description": "Directories to exclude from file size tracking. This improves performance by reducing unnecessary file system operations."
+        },
+        "fileSizeBadge.excludedGlobs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Glob patterns to exclude from file size tracking. Examples: `**/*.min.js`, `**/*.map`, `**/coverage/**`."
         },
         "fileSizeBadge.loc": {
           "type": "object",
