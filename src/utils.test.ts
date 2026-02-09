@@ -1,13 +1,14 @@
+import type { Stats } from "node:fs";
 import fs from "fs/promises";
-import { getFileSize, formatFileSize, formatBadgeFileSize } from "../utils";
+import { getFileSize, formatFileSize, formatBadgeFileSize } from "./utils";
 
-jest.mock("fs/promises", () => ({
-  stat: jest.fn()
+vi.mock("fs/promises", () => ({
+  default: { stat: vi.fn() }
 }));
 
 describe("utils", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("getFileSize", () => {
@@ -15,8 +16,8 @@ describe("utils", () => {
       const mockStat = {
         isFile: () => true,
         size: 1024
-      };
-      (fs.stat as jest.Mock).mockResolvedValue(mockStat);
+      } as unknown as Stats;
+      vi.mocked(fs.stat).mockResolvedValue(mockStat);
 
       const result = await getFileSize("/path/to/file.txt");
       expect(result).toBe(1024);
@@ -27,22 +28,22 @@ describe("utils", () => {
       const mockStat = {
         isFile: () => false,
         size: 1024
-      };
-      (fs.stat as jest.Mock).mockResolvedValue(mockStat);
+      } as unknown as Stats;
+      vi.mocked(fs.stat).mockResolvedValue(mockStat);
 
       const result = await getFileSize("/path/to/directory");
       expect(result).toBeNull();
     });
 
     it("should return null when file does not exist", async () => {
-      (fs.stat as jest.Mock).mockRejectedValue(new Error("File not found"));
+      vi.mocked(fs.stat).mockRejectedValue(new Error("File not found"));
 
       const result = await getFileSize("/path/to/nonexistent.txt");
       expect(result).toBeNull();
     });
 
     it("should return null when stat throws any error", async () => {
-      (fs.stat as jest.Mock).mockRejectedValue(new Error("Permission denied"));
+      vi.mocked(fs.stat).mockRejectedValue(new Error("Permission denied"));
 
       const result = await getFileSize("/path/to/file.txt");
       expect(result).toBeNull();

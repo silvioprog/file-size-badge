@@ -2,7 +2,7 @@
   "name": "file-size-badge",
   "displayName": "File Size Badge",
   "description": "Displays file sizes as badges in the file explorer and shows the active file size in the status bar. Also displays Lines of Code (LOC) information in tooltips and status bar.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "silvioprog",
   "license": "MIT",
   "icon": "icon.png",
@@ -90,7 +90,7 @@
     "compile": "esbuild src/extension.ts --bundle --platform=node --target=node18 --outfile=dist/extension.js --external:vscode --format=cjs --sourcemap",
     "watch": "npm run compile -- --watch",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "vitest run",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -104,17 +104,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.4",
     "@types/vscode": "^1.85.0",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.27.3",
     "eslint": "^9.39.2",
     "husky": "^9.1.7",
-    "jest": "^30.2.0",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
-    "ts-jest": "^29.4.6",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.54.0",
+    "vitest": "^4.0.18"
   }
 }

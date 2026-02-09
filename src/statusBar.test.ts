@@ -1,34 +1,34 @@
 import * as vscode from "vscode";
-import { formatFileSize, getFileSize } from "../utils";
-import { formatLoc, getLineCounts } from "../loc";
+import { formatFileSize, getFileSize } from "./utils";
+import { formatLoc, getLineCounts } from "./loc";
 
-jest.mock("../utils");
-jest.mock("../loc");
+vi.mock("./utils");
+vi.mock("./loc");
 
 let mockStatusBarItem: {
   text: string;
   tooltip: string;
-  show: jest.Mock;
-  hide: jest.Mock;
+  show: ReturnType<typeof vi.fn>;
+  hide: ReturnType<typeof vi.fn>;
 };
-let statusBarModule: typeof import("../statusBar");
+let statusBarModule: typeof import("./statusBar");
 
 beforeAll(async () => {
   mockStatusBarItem = {
     text: "",
     tooltip: "",
-    show: jest.fn(),
-    hide: jest.fn()
+    show: vi.fn(),
+    hide: vi.fn()
   };
-  (vscode.window.createStatusBarItem as jest.Mock).mockReturnValue(
-    mockStatusBarItem
+  vi.mocked(vscode.window.createStatusBarItem).mockReturnValue(
+    mockStatusBarItem as unknown as vscode.StatusBarItem
   );
-  statusBarModule = await import("../statusBar");
+  statusBarModule = await import("./statusBar");
 });
 
 describe("statusBar", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (
       vscode.window as { activeTextEditor?: { document: { uri: vscode.Uri } } }
     ).activeTextEditor = undefined;
@@ -37,8 +37,8 @@ describe("statusBar", () => {
     ).activeTab = undefined;
     mockStatusBarItem.text = "";
     mockStatusBarItem.tooltip = "";
-    (getLineCounts as jest.Mock).mockResolvedValue(null);
-    (formatLoc as jest.Mock).mockReturnValue({
+    vi.mocked(getLineCounts).mockResolvedValue(null);
+    vi.mocked(formatLoc).mockReturnValue({
       text: "1 KB",
       tooltip: "1 KB"
     });
@@ -51,10 +51,10 @@ describe("statusBar", () => {
     ).activeTextEditor = {
       document: { uri: mockUri }
     };
-    (getFileSize as jest.Mock).mockResolvedValue(1024);
-    (formatFileSize as jest.Mock).mockReturnValue("1 KB");
-    (getLineCounts as jest.Mock).mockResolvedValue(null);
-    (formatLoc as jest.Mock).mockReturnValue({
+    vi.mocked(getFileSize).mockResolvedValue(1024);
+    vi.mocked(formatFileSize).mockReturnValue("1 KB");
+    vi.mocked(getLineCounts).mockResolvedValue(null);
+    vi.mocked(formatLoc).mockReturnValue({
       text: "1 KB",
       tooltip: "1 KB"
     });
@@ -75,11 +75,11 @@ describe("statusBar", () => {
     ).activeTextEditor = {
       document: { uri: mockUri }
     };
-    (getFileSize as jest.Mock).mockResolvedValue(1239);
-    (formatFileSize as jest.Mock).mockReturnValue("1.21 KB");
+    vi.mocked(getFileSize).mockResolvedValue(1239);
+    vi.mocked(formatFileSize).mockReturnValue("1.21 KB");
     const lineCounts = { total: 38, loc: 35 };
-    (getLineCounts as jest.Mock).mockResolvedValue(lineCounts);
-    (formatLoc as jest.Mock).mockReturnValue({
+    vi.mocked(getLineCounts).mockResolvedValue(lineCounts);
+    vi.mocked(formatLoc).mockReturnValue({
       text: "38 lines (35 loc) \u2022 1.21 KB",
       tooltip: "38 lines (35 loc) \u2022 1.21 KB"
     });

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 beforeAll(async () => {
-  await import("../provider");
+  await import("./provider");
 });
 
 describe("provider", () => {
