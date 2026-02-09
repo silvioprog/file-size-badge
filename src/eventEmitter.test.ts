@@ -3,7 +3,7 @@ import {
   eventEmitter,
   updateDecorations,
   onDidChangeFileDecorations
-} from "../eventEmitter";
+} from "./eventEmitter";
 
 describe("eventEmitter", () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe("eventEmitter", () => {
 
   it("should fire event when updateDecorations is called", () => {
     const mockUri = vscode.Uri.file("/path/to/file.txt");
-    const listener = jest.fn();
+    const listener = vi.fn();
     const disposable = onDidChangeFileDecorations(listener);
 
     updateDecorations(mockUri);

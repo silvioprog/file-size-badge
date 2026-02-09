@@ -1,36 +1,38 @@
+import { vi } from "vitest";
+
 export const window = {
   activeTextEditor: undefined as { document: { uri: Uri } } | undefined,
   tabGroups: {
     activeTabGroup: {
       activeTab: undefined as unknown
     },
-    onDidChangeTabs: jest.fn(() => ({
-      dispose: jest.fn()
+    onDidChangeTabs: vi.fn(() => ({
+      dispose: vi.fn()
     }))
   },
-  createStatusBarItem: jest.fn(() => ({
+  createStatusBarItem: vi.fn(() => ({
     text: "",
     tooltip: "",
-    show: jest.fn(),
-    hide: jest.fn()
+    show: vi.fn(),
+    hide: vi.fn()
   })),
-  registerFileDecorationProvider: jest.fn(() => ({
-    dispose: jest.fn()
+  registerFileDecorationProvider: vi.fn(() => ({
+    dispose: vi.fn()
   })),
-  onDidChangeActiveTextEditor: jest.fn(() => ({
-    dispose: jest.fn()
+  onDidChangeActiveTextEditor: vi.fn(() => ({
+    dispose: vi.fn()
   }))
 };
 
 export const workspace = {
-  createFileSystemWatcher: jest.fn(() => ({
-    onDidCreate: jest.fn(),
-    onDidDelete: jest.fn(),
-    onDidChange: jest.fn(),
-    dispose: jest.fn()
+  createFileSystemWatcher: vi.fn(() => ({
+    onDidCreate: vi.fn(),
+    onDidDelete: vi.fn(),
+    onDidChange: vi.fn(),
+    dispose: vi.fn()
   })),
-  getConfiguration: jest.fn((section?: string) => ({
-    get: jest.fn((key: string, defaultValue?: unknown) => {
+  getConfiguration: vi.fn((section?: string) => ({
+    get: vi.fn((key: string, defaultValue?: unknown) => {
       if (section === "fileSizeBadge") {
         if (key === "excludedDirectories") {
           return defaultValue || [".git", "build", "dist", "node_modules"];
@@ -57,11 +59,11 @@ export const workspace = {
     })
   })),
   textDocuments: [],
-  onDidSaveTextDocument: jest.fn(() => ({
-    dispose: jest.fn()
+  onDidSaveTextDocument: vi.fn(() => ({
+    dispose: vi.fn()
   })),
-  onDidChangeConfiguration: jest.fn(() => ({
-    dispose: jest.fn()
+  onDidChangeConfiguration: vi.fn(() => ({
+    dispose: vi.fn()
   }))
 };
 
