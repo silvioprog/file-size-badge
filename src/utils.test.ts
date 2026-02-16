@@ -1,6 +1,7 @@
 import type { Stats } from "node:fs";
 import fs from "fs/promises";
 import { getFileSize, formatFileSize, formatBadgeFileSize } from "./utils";
+import { clearAll } from "./cache";
 
 vi.mock("fs/promises", () => ({
   default: { stat: vi.fn() }
@@ -9,6 +10,7 @@ vi.mock("fs/promises", () => ({
 describe("utils", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearAll();
   });
 
   describe("getFileSize", () => {

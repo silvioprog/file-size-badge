@@ -1,6 +1,12 @@
 import { readFile } from "fs/promises";
 import * as vscode from "vscode";
 import { isBinaryFile } from "isbinaryfile";
+import { createCache } from "./cache";
+
+const MAX_LOC_FILE_SIZE = 5 * 1024 * 1024;
+const lineCountsCache = createCache<{ total: number; loc: number } | null>(
+  1000
+);
 
 const getLocConfig = () => {
   const config = vscode.workspace.getConfiguration("fileSizeBadge.loc");
@@ -18,7 +24,10 @@ const getLineCountsFromDocument = (doc: vscode.TextDocument) => ({
   ).length
 });
 
-export const getLineCounts = async (fsPath: string) => {
+export const getLineCounts = async (
+  fsPath: string,
+  options?: { fileSize?: number; token?: vscode.CancellationToken }
+) => {
   try {
     const uri = vscode.Uri.file(fsPath);
     const activeEditor = vscode.window.activeTextEditor;
@@ -31,16 +40,25 @@ export const getLineCounts = async (fsPath: string) => {
     if (openDoc) {
       return getLineCountsFromDocument(openDoc);
     }
-    if (await isBinaryFile(fsPath)) {
+    if (options?.fileSize && options.fileSize > MAX_LOC_FILE_SIZE) {
       return null;
     }
+    const cached = lineCountsCache.get(fsPath);
+    if (cached !== undefined) return cached;
+    if (options?.token?.isCancellationRequested) return null;
+    if (await isBinaryFile(fsPath)) {
+      lineCountsCache.set(fsPath, null);
+      return null;
+    }
+    if (options?.token?.isCancellationRequested) return null;
     const content = await readFile(fsPath, "utf8");
     const lines = content.split(/\r?\n/);
-
-    return {
+    const result = {
       total: lines.length,
       loc: lines.filter((line) => line.trim().length > 0).length
     };
+    lineCountsCache.set(fsPath, result);
+    return result;
   } catch {
     return null;
   }
