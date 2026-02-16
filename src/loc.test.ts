@@ -2,6 +2,7 @@ import { readFile } from "fs/promises";
 import * as vscode from "vscode";
 import { isBinaryFile } from "isbinaryfile";
 import { formatLoc, getLineCounts } from "./loc";
+import { clearAll } from "./cache";
 
 vi.mock("fs/promises", () => ({
   readFile: vi.fn()
@@ -13,6 +14,7 @@ vi.mock("isbinaryfile", () => ({
 describe("loc", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearAll();
     vi.mocked(isBinaryFile).mockResolvedValue(false);
     vi.mocked(vscode.workspace.getConfiguration).mockImplementation(
       (section?: string) => {
@@ -109,6 +111,56 @@ describe("loc", () => {
       vi.mocked(isBinaryFile).mockResolvedValue(true);
 
       const result = await getLineCounts("/path/to/image.png");
+      expect(result).toBeNull();
+      expect(readFile).not.toHaveBeenCalled();
+    });
+
+    it("should return null for files exceeding size limit", async () => {
+      const result = await getLineCounts("/path/to/huge.txt", {
+        fileSize: 10 * 1024 * 1024
+      });
+      expect(result).toBeNull();
+      expect(isBinaryFile).not.toHaveBeenCalled();
+      expect(readFile).not.toHaveBeenCalled();
+    });
+
+    it("should process files within size limit", async () => {
+      const content = "line 1\nline 2";
+      vi.mocked(readFile).mockResolvedValue(content);
+
+      const result = await getLineCounts("/path/to/file.txt", {
+        fileSize: 1024
+      });
+      expect(result).toEqual({ total: 2, loc: 2 });
+    });
+
+    it("should return null when token is already cancelled", async () => {
+      const token = {
+        isCancellationRequested: true,
+        onCancellationRequested: vi.fn()
+      } as unknown as import("vscode").CancellationToken;
+
+      const result = await getLineCounts("/path/to/file.txt", { token });
+      expect(result).toBeNull();
+      expect(isBinaryFile).not.toHaveBeenCalled();
+      expect(readFile).not.toHaveBeenCalled();
+    });
+
+    it("should return null when cancelled between async operations", async () => {
+      let cancelled = false;
+      const token = {
+        get isCancellationRequested() {
+          return cancelled;
+        },
+        onCancellationRequested: vi.fn()
+      } as unknown as import("vscode").CancellationToken;
+
+      vi.mocked(isBinaryFile).mockImplementation(async () => {
+        cancelled = true;
+        return false;
+      });
+
+      const result = await getLineCounts("/path/to/file.txt", { token });
       expect(result).toBeNull();
       expect(readFile).not.toHaveBeenCalled();
     });
