@@ -11,11 +11,13 @@ export const provider = vscode.window.registerFileDecorationProvider({
     const fileSize = await getFileSize(uri.fsPath);
     if (fileSize === null) return;
     if (token.isCancellationRequested) return;
+    const lineCounts = await getLineCounts(uri.fsPath, { fileSize, token });
+    if (token.isCancellationRequested) return;
 
     return {
       badge: formatBadgeFileSize(fileSize),
       tooltip: formatLoc({
-        lineCounts: await getLineCounts(uri.fsPath),
+        lineCounts,
         formattedFileSize: formatFileSize(fileSize)
       }).tooltip
     };
