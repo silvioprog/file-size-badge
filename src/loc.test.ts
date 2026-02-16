@@ -112,6 +112,56 @@ describe("loc", () => {
       expect(result).toBeNull();
       expect(readFile).not.toHaveBeenCalled();
     });
+
+    it("should return null for files exceeding size limit", async () => {
+      const result = await getLineCounts("/path/to/huge.txt", {
+        fileSize: 10 * 1024 * 1024
+      });
+      expect(result).toBeNull();
+      expect(isBinaryFile).not.toHaveBeenCalled();
+      expect(readFile).not.toHaveBeenCalled();
+    });
+
+    it("should process files within size limit", async () => {
+      const content = "line 1\nline 2";
+      vi.mocked(readFile).mockResolvedValue(content);
+
+      const result = await getLineCounts("/path/to/file.txt", {
+        fileSize: 1024
+      });
+      expect(result).toEqual({ total: 2, loc: 2 });
+    });
+
+    it("should return null when token is already cancelled", async () => {
+      const token = {
+        isCancellationRequested: true,
+        onCancellationRequested: vi.fn()
+      } as unknown as import("vscode").CancellationToken;
+
+      const result = await getLineCounts("/path/to/file.txt", { token });
+      expect(result).toBeNull();
+      expect(isBinaryFile).not.toHaveBeenCalled();
+      expect(readFile).not.toHaveBeenCalled();
+    });
+
+    it("should return null when cancelled between async operations", async () => {
+      let cancelled = false;
+      const token = {
+        get isCancellationRequested() {
+          return cancelled;
+        },
+        onCancellationRequested: vi.fn()
+      } as unknown as import("vscode").CancellationToken;
+
+      vi.mocked(isBinaryFile).mockImplementation(async () => {
+        cancelled = true;
+        return false;
+      });
+
+      const result = await getLineCounts("/path/to/file.txt", { token });
+      expect(result).toBeNull();
+      expect(readFile).not.toHaveBeenCalled();
+    });
   });
 
   describe("formatLoc", () => {

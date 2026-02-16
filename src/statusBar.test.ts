@@ -62,7 +62,9 @@ describe("statusBar", () => {
     await statusBarModule.updateStatusBar();
 
     expect(getFileSize).toHaveBeenCalledWith("/path/to/file.txt");
-    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt", {
+      fileSize: 1024
+    });
     expect(mockStatusBarItem.text).toBe("$(file) 1 KB");
     expect(mockStatusBarItem.tooltip).toBe("1 KB");
     expect(mockStatusBarItem.show).toHaveBeenCalled();
@@ -87,7 +89,9 @@ describe("statusBar", () => {
     await statusBarModule.updateStatusBar();
 
     expect(getFileSize).toHaveBeenCalledWith("/path/to/file.txt");
-    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt");
+    expect(getLineCounts).toHaveBeenCalledWith("/path/to/file.txt", {
+      fileSize: 1239
+    });
     expect(formatLoc).toHaveBeenCalledWith({
       lineCounts,
       formattedFileSize: "1.21 KB"
